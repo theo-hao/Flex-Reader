@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" initialize="init()" > 
+<mx:Script> 
+<![CDATA[ 
+import mx.collections.ArrayCollection; 
+import mx.events.ListEvent; 
+import flash.events.Event; 
+public var myArray:Array = ["AL", "AK", "AR"]; 
+var listData:ArrayCollection=new ArrayCollection(myArray); 
+private function init():void 
+{ 
+var contextMenu1:ContextMenu=new ContextMenu();//创建右键菜单 
+      contextMenu1.hideBuiltInItems();//隐藏内置菜单 
+      var renameMenuItem:ContextMenuItem=new ContextMenuItem("重命名"); 
+      contextMenu1.customItems.push(renameMenuItem); 
+      renameMenuItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT ,renameHandler); 
+      myList.contextMenu=contextMenu1; 
+} 
+private function renameHandler(e:ContextMenuEvent):void 
+{ 
+myList.editable=true; 
+            myList.editedItemPosition = { rowIndex:Number(myList.selectedIndex), columnIndex:Number(0) }; 
+} 
+private function itemEndHandler(e:Event):void 
+      { 
+      myList.editable=false; 
+      }
+
+]]> 
+</mx:Script> 
+<mx:List id="myList" dataProvider="{listData}" x="200" y="100" width="180" height="322"  itemEditEnd="{itemEndHandler(event)}"/> 
+</mx:Application>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.VBox;
+			import mx.controls.scrollClasses.ScrollBar;
+			import mx.events.ScrollEvent;
+			import mx.controls.SWFLoader;
+			import mx.controls.Alert;
+			import mx.events.*;
+			import flash.utils.Dictionary;
+			import mx.managers.PopUpManager;
+			import mx.controls.Label;
+			import mx.containers.TitleWindow;
+						
+			private var pathes:Array =  ["source/swf/1.swf","source/swf/2.swf","source/swf/3.swf","source/swf/4.swf","source/swf/5.swf",];
+			private var ySize:Number = 800;
+			private var last_page:Number = 3;
+			private var page_count:Number =pathes.length;
+			private var hash_loader:Dictionary = new Dictionary(true);
+			private var vBox_tips:CustomTitleWindow;
+			
+			private function init():void
+			{
+				for(var i:Number = 0;i< pathes.length;i++)
+				{
+					var swf_loader:SWFLoader = new SWFLoader();
+					swf_loader.id = 'swf_content_' + (i+1);
+					swf_loader.name = 'swf_content_' + (i+1);
+					
+					if(i < last_page)
+					{
+						swf_loader.source =  pathes[i];
+					}
+					hash_loader[swf_loader.id] = swf_loader;
+					swf_loader.height = ySize;
+					swf_loader.width = 600;
+					swf_loader.addEventListener(Event.COMPLETE,complete);
+					swf_context.addChild(swf_loader);
+				}
+				//
+				vBox_tips = CustomTitleWindow(PopUpManager.createPopUp(swf_context,CustomTitleWindow,false));
+				vBox_tips.width = 80;
+				vBox_tips.height = 200;
+				vBox_tips.setStyle('right','0');
+				var label_1:Label = new Label();
+				label_1.text = "123";
+				vBox_tips.addChild(label_1);
+				//vBox_tips.setStyle("backgroundImage","source/image/background.png");
+				vBox_tips.setStyle("backgroundAlpha ","20%");
+ 				vBox_tips.setStyle("backgroundColor","#F0F0F0");
+				vBox_tips.addEventListener(MouseEvent.MOUSE_OVER,vBox_tip_mouse_over);
+				vBox_tips.addEventListener(MouseEvent.MOUSE_OUT,vBox_tip_mouse_out);
+				PopUpManager.centerPopUp(vBox_tips);
+				vBox_tips.x = 530;
+				vBox_tips.y = 300;
+				vBox_tips.setStyle("backgroundAttachment","fixed");
+				vBox_tips.setStyle('right',10);
+				vBox_tips.setStyle("borderStyle","Solid");
+				vBox_tips.setStyle("borderColor","#000000");
+			}
+			
+			private function vBox_tip_mouse_over(e:MouseEvent):void
+			{
+					vBox_tips.setStyle("backgroundColor","#606060");
+					vBox_tips.setStyle("backgroundAlpha ","0%");
+			}
+			
+			private function vBox_tip_mouse_out(e:MouseEvent):void
+			{
+				vBox_tips.setStyle("backgroundColor","#F0F0F0");
+				//e.target.backgroundColor = "#F0F0F0";
+				vBox_tips.setStyle("backgroundAlpha ","20%");
+				//e.target.alpha  = 0.2;
+			}
+			
+		   private function titleWindow_close(evt:CloseEvent):void {   
+
+   			}
+   		
+			
+			private function complete(e:Event):void
+			{
+				
+			}
+			
+			private function dymic_load(e:ScrollEvent):void
+			{
+				try{
+				main_panel.status = e.position.toString();
+				var vertical_y:Number = e.position;
+				var current_view_page:Number = (vertical_y - vertical_y % ySize)/ySize;
+				main_panel.status = (current_view_page + 1).toString();
+				
+				if ((current_view_page + 1) > (last_page -2) && last_page <= page_count)
+				{
+					last_page ++;
+					var loader:SWFLoader = hash_loader['swf_content_'+last_page] as SWFLoader;
+					loader.source = pathes[last_page - 1];
+				}
+				}catch(err:Error)
+				{
+					trace(err.getStackTrace());
+				}
+			}
+				
+		]]>
+	</mx:Script>
+	<mx:Panel id="main_panel" width="650" height="730" top="200" backgroundColor="#FFFFFF" 
+		layout="vertical" verticalScrollPolicy="off"  horizontalScrollPolicy="off" >
+		<mx:HBox width="100%" height="30" backgroundColor="#000000"   />
+		<mx:Panel id="swf_context"  left="5" right="5" height="700" width="640"  
+			backgroundColor="#909090" layout="vertical"  horizontalAlign="center"
+			scroll="dymic_load(event)">
+		</mx:Panel>
+	</mx:Panel>
+</mx:Application>

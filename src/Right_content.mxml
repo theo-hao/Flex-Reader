@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="955" minHeight="600"
+               creationComplete="init()"
+               >
+    <mx:Script>
+            import flash.net.navigateToURL;
+            
+            import mx.controls.Alert;
+            
+            internal var blogItem:ContextMenuItem;
+            internal var authorItem:ContextMenuItem;
+            internal var qqItem:ContextMenuItem;
+            internal var mailItem:ContextMenuItem
+            
+        
+            /**
+             * 定制自己的右键菜单
+             */
+            internal function init():void{
+                //创建一个右键上下文菜单
+                var contextMenu:ContextMenu=new ContextMenu();
+                //隐藏指定的 ContextMenu对象中的所有内置菜单项（“设置”除外）。
+                contextMenu.hideBuiltInItems();
+                //创建上下文菜单选项
+                authorItem=new ContextMenuItem("作者:雪山飞鹄");
+                //创建上下文菜单选项
+                qqItem=new ContextMenuItem("QQ:184675420");
+                //创建上下文菜单选项
+                mailItem=new ContextMenuItem("Email:sxyx2008@163.com");
+                //创建上下文菜单选项
+                blogItem=new ContextMenuItem("Blog:http://www.blogjava.net/sxyx2008/");
+                
+                //将子菜单系添加到子菜单中
+                contextMenu.customItems.push(authorItem);
+                contextMenu.customItems.push(qqItem);
+                contextMenu.customItems.push(mailItem);
+                contextMenu.customItems.push(blogItem);
+                
+                //为每个子菜单项添加监听事件
+                blogItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,menuItemHandler);
+                authorItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,menuItemHandler);
+                qqItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,menuItemHandler);
+                mailItem.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,menuItemHandler);
+                
+                //为上下文菜单设置监听
+                contextMenu.addEventListener(ContextMenuEvent.MENU_SELECT,menuHandler);
+                
+                //将该上下文菜单赋值给当前应用环境
+                this.contextMenu=contextMenu;
+                //this.contextMenu = null;
+            }
+            
+            //菜单监听处理函数
+            internal function menuHandler(evt:ContextMenuEvent):void{
+                trace("menu");
+            }    
+        
+        
+        
+            //子菜单项监听处理函数
+            internal function menuItemHandler(evt:ContextMenuEvent):void{
+                //获取事件源，斌将其转化为ContextMenuItem
+                var item:ContextMenuItem=ContextMenuItem(evt.currentTarget);
+                var caption:String=item.caption;
+                switch(caption)
+                {
+                    case blogItem.caption:
+                    {
+                        //若为blog地址，则请求到该地址
+                        navigateToURL(new URLRequest("http://www.blogjava.net/sxyx2008/"),"_blank");
+                        break;
+                    }
+                    default:
+                    {
+                        Alert.show(caption,"右键菜单项");
+                        break;
+                    }
+                }
+            }
+            
+            
+    </mx:Script>
+    
+    
+</mx:Application>

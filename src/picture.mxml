@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			
+			//private var arr:Array = ["japan_1.jpg","japan_2.jpg","travel_1.jpg","travel_2.jpg","travel_3.jpg"];
+			
+			private function click(e:ListEvent):void
+			{
+                var t:Tree = e.currentTarget as Tree;
+                var dataObj:Object = e.itemRenderer.data;
+                if ( dataObj.hasOwnProperty("@src")){
+                	var swf_loader:mx.controls.SWFLoader = new mx.controls.SWFLoader();
+                	swf_loader.source = dataObj.@src;
+                	swf_loader.addEventListener(Event.COMPLETE,swfLoader_complete);
+                	swf_loader.scaleContent = true;
+                	v_box.addChild(swf_loader);
+                	//loader.source = dataObj.@src;
+                }else if(t.dataDescriptor.isBranch(t.selectedItem)){
+                	//loader.source = null;
+                	//panel.status = '';
+                	//panel.status = 
+                }
+            }
+
+            private function tree_labelFunc(item:Object):String {
+            	var suffix:String = '';
+            	if (tree.dataDescriptor.isBranch(item)){
+            		suffix = " (" + item.children().length() + ")";
+            	}
+            	return item.@label + suffix;
+            }
+
+			private function swfLoader_complete(e:Event):void
+			{
+				//panel.status = (loader.bytesTotal / 1024).toFixed(2) + "KB";
+				panel.status = v_box.childDescriptors.length.toString();
+			}
+		]]>
+	</mx:Script>
+	
+    <mx:XML id="dp" source="source/xml/swf.xml" />
+	<mx:HDividedBox width="800" height="600" backgroundAlpha="#FFFFFF">
+		<mx:Panel width="100%" height="100%">
+			 <mx:Tree id="tree"
+                    dataProvider="{dp}"
+                    labelFunction="tree_labelFunc"
+                    showRoot="false"
+                    width="100%"
+                    height="100%"
+                    itemClick="click(event);" />
+		</mx:Panel>
+		<mx:Panel width="100%" height="100%" id="panel">
+			
+             <mx:VBox id="v_box" width="100%"
+                    height="95%">
+             
+             </mx:VBox>
+		</mx:Panel>
+	</mx:HDividedBox>
+</mx:Application>

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init()">
+<mx:Script>
+	<![CDATA[
+		import mx.managers.CursorManager;
+		import mx.events.DragEvent;
+		import mx.effects.MaskEffect;
+		import mx.controls.TextInput;
+		import mx.controls.Image;
+		import mx.controls.Label;
+		import mx.managers.PopUpManager;
+		import mx.events.ScrollEvent;
+		import mx.controls.HRule;
+		import mx.controls.SWFLoader;
+		import mx.controls.Alert;
+		import mx.effects.Zoom;
+		import mx.managers.CursorManager;
+		import mx.managers.CursorManagerPriority;
+		
+		private var pathes:Array =  ["source/swf/1.swf","source/swf/2.swf","source/swf/3.swf","source/swf/4.swf","source/swf/5.swf",];
+		private var ySize:Number = 800;
+		private var page_count:Number =pathes.length;
+		private var last_page:Number = 3;
+		private var loader_hash:Dictionary = new Dictionary(true);
+		private var goto_page:TextInput;
+        
+		private function init():void
+		{
+			this.contextMenu = null;
+			//createMenu_dg_Users();
+			//this.addEventListener(MouseEvent.CLICK,right_context_menu);
+			for(var i:Number = 0;i<page_count;i++)
+			{
+				var loader:SWFLoader = new SWFLoader();
+				loader.id = "swf_content_" + i;
+				loader.height = ySize;
+				loader.width = 600;
+				if(i<last_page)
+				{
+					loader.source = pathes[i];
+				}
+				loader.setStyle("top",ySize * i);
+				loader_hash["swf_content_" + i] = loader;
+				swfs.addChild(loader);
+				/*loader.addEventListener(MouseEvent.MOUSE_DOWN,drag_enter_func);
+                loader.addEventListener(MouseEvent.MOUSE_UP,drag_complete_func);
+				loader.addEventListener(MouseEvent.MOUSE_MOVE,drag_move_func);*/
+//				loader.addEventListener(DragEvent.DRAG_EXIT,drag_out);
+				//loader.addEventListener(DragEvent.DRAG_START,drag_enter);
+				//loader.addEventListener(DragEvent.DRAG_OVER,drag_move);
+				//loader.addEventListener(DragEvent.DRAG_COMPLETE,drag_out);
+				//loader.addEventListener(MouseEvent.MOUSE_OUT,drag_out_func);
+			}
+				swfs.addEventListener(MouseEvent.MOUSE_DOWN,drag_enter_func);
+                swfs.addEventListener(MouseEvent.MOUSE_UP,drag_complete_func);
+				swfs.addEventListener(MouseEvent.MOUSE_MOVE,drag_move_func);
+				swfs.addEventListener(MouseEvent.MOUSE_OUT,drag_out_func);
+			
+			//swfs.addEventListener(ScrollEvent.SCROLL,swf_content_scroll);
+			
+			//加载
+			var customTitle:CustomTitleWindow =CustomTitleWindow(PopUpManager.createPopUp(swfs,CustomTitleWindow,false));
+			customTitle.width = 70;
+			customTitle.height = 170;
+			customTitle.setStyle("horizontalAlign","center");
+			var page_up:Image = new Image();
+			var page_down:Image = new Image();
+			goto_page = new TextInput();
+			var page_total:Label = new Label();
+			
+			page_up.source = "source/image/page_up.png";
+			page_down.source = "source/image/page_down.png";
+			
+			page_up.width = 60;
+			page_up.height = 40;
+			page_down.width = 60;
+			page_down.height = 40;
+			goto_page.width = 60;
+			goto_page.height = 20;
+			page_total.setStyle("fontSize","18");
+			
+			page_total.text = "/" + page_count;
+			
+			page_up.addEventListener(MouseEvent.CLICK,page_up_click);
+			page_down.addEventListener(MouseEvent.CLICK,page_down_click);
+			goto_page.addEventListener(KeyboardEvent.KEY_DOWN,goto_page_keydown);
+			goto_page.restrict = "0-9";
+			goto_page.text = "1";
+			customTitle.addChild(page_up);
+			customTitle.addChild(new HRule());
+			customTitle.addChild(goto_page);
+			customTitle.addChild(page_total);
+			customTitle.addChild(new HRule());
+			customTitle.addChild(page_down);
+			
+			PopUpManager.centerPopUp(customTitle);
+			customTitle.x = 500;
+			customTitle.y = 250;
+			customTitle.setStyle("backgroundColor","#939393");
+			customTitle.addEventListener(MouseEvent.MOUSE_OVER,mouse_over);
+			customTitle.addEventListener(MouseEvent.MOUSE_OUT,mouse_out);
+			page_up.addEventListener(MouseEvent.MOUSE_OVER,mouse_over);
+			page_up.addEventListener(MouseEvent.MOUSE_OUT,mouse_out);
+			page_down.addEventListener(MouseEvent.MOUSE_OVER,mouse_over);
+			page_down.addEventListener(MouseEvent.MOUSE_OUT,mouse_out);
+			customTitle.alpha = 0.6;
+		}
+		
+		
+		
+		private function swf_content_scroll(e:ScrollEvent):void
+		{
+			var vertical_y:Number = e.position;
+			scroll_loading(vertical_y);
+		}
+		
+		private function scroll_loading(vertical_y:Number):void
+		{
+			var current_view_page:Number = (vertical_y - vertical_y % ySize)/ySize;
+				goto_page.text = String(current_view_page + 1);
+				try{
+					if((current_view_page +1) > (last_page - 2) && last_page <= page_count)
+					{
+						var loader:SWFLoader = loader_hash['swf_content_'+last_page] as SWFLoader;
+						if(loader != null)
+						{
+							loader.source = pathes[last_page];
+						}
+						last_page++;
+					}
+				}catch(err:Error){
+					trace(err);
+				}
+		}
+		
+		
+		private function goto_page_keydown(e:KeyboardEvent):void
+		{
+			//确定键
+			if(e.keyCode == 13)
+			{
+				//TODO 跳转页面
+				var page:Number = Number(e.target.text);
+				if(page <= page_count)
+				{
+					goto_page_func(page);
+				}else{
+					Alert.show("超出了页码!");
+				}
+				
+			}
+		}
+		
+		private function goto_page_func(page:Number):void
+		{
+			var loader:SWFLoader = loader_hash['swf_content_' + (page - 1)] as SWFLoader;
+			swfs.verticalScrollPosition = (page-1) * ySize - 200;
+			
+			if(loader != null && loader.source == null)
+			{
+				loader.source = pathes[page - 1];
+				//添加前面的没有source的文件
+			}
+		}
+		
+		private function page_up_click(e:MouseEvent):void
+		{
+			var verticalPosition:Number = swfs.verticalScrollPosition;
+			var current_page:Number = (verticalPosition - verticalPosition % ySize) / ySize;
+			if(current_page == 0)
+			{
+				return;
+			}
+			goto_page.text = String(current_page);
+			swfs.verticalScrollPosition = (current_page -1) * ySize;
+		}
+		
+		private function page_down_click(e:MouseEvent):void
+		{
+			var verticalPosition:Number = swfs.verticalScrollPosition;
+			var current_page:Number = (verticalPosition - verticalPosition % ySize) / ySize;
+			
+			if((current_page + 2) > page_count)
+			{
+				return;
+			}
+			
+			if(current_page +1 > last_page)
+			{
+				goto_page_func(current_page + 2);
+				for(var i:Number = last_page; i<= current_page + 1;i++)
+				{
+					goto_page_func(i);
+					last_page = i;
+				}
+			}
+			goto_page.text = String(current_page+2);
+			swfs.verticalScrollPosition = (current_page + 1) * ySize;
+		}
+		
+		private function mouse_over(e:MouseEvent):void
+		{
+			e.target.alpha = 1;
+		}
+		
+		private function mouse_out(e:MouseEvent):void
+		{
+			e.target.alpha = 0.6;
+		}
+		
+		private function zoom_in_func(e:Event):void
+		{
+			do_zoom(0.2);
+		}
+		
+		private function do_zoom(ratio:Number):void
+		{
+			var horizontal:Number = 0;
+			var vertical:Number = 0;
+			for each (var swf:SWFLoader in loader_hash)
+			{
+				swf.height = swf.height * (1+ratio);
+				swf.width = swf.width * (1 +ratio);
+				var id:String = swf.id;
+				var index:Number =Number(id.replace("swf_content_",""));
+				horizontal = swf.width * ratio;
+				vertical = swf.height * ratio;
+				swf.setStyle("top",index * (swf.height + 1) );
+				ySize = swf.height;
+			}
+			//swfs.verticalScrollPosition = vertical > 0 ? (swfs.verticalScrollPosition + vertical) : (swfs.verticalScrollPosition + vertical)
+			swfs.horizontalScrollPosition = horizontal > 0 ?(swfs.horizontalScrollPosition + horizontal) : (swfs.horizontalScrollPosition + horizontal);
+		}
+		
+		private function zoom_out_func(e:MouseEvent):void
+		{
+			do_zoom(-0.2);
+		}
+		private var dragging:Boolean = false;
+		
+		private var point:Point;
+		
+		//MouseDown
+		private function drag_enter_func(e:MouseEvent):void
+		{
+			dragging = true;
+			point = new Point(e.localX,e.localY);
+		}
+		
+		private var cursorImg:Class;
+		
+		private function drag_out_func(e:MouseEvent):void
+		{
+			dragging = false;
+		}
+		
+		private function drag_move_func(e:MouseEvent):void
+		{
+			if(dragging)
+			{
+				scroll_loading(swfs.verticalScrollPosition);
+				var point_m:Point = new Point(e.localX,e.localY);
+				swfs.horizontalScrollPosition = swfs.horizontalScrollPosition - ( point_m.x - point.x);
+				swfs.verticalScrollPosition = swfs.verticalScrollPosition - (point_m.y - point.y);
+				point = point_m;
+			}
+		}
+		
+		private function drag_complete_func(e:MouseEvent):void
+		{
+			dragging = false;
+			
+			point = new Point(0,0);
+		}		
+	]]>
+</mx:Script>
+		<mx:Canvas width="600" height="700" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+		<mx:Canvas width="600" height="50" backgroundColor="#000000" > 
+			
+		</mx:Canvas>
+		<mx:Canvas width="600" height="600" top="50" 
+		 	id="swfs" scroll="swf_content_scroll(event)" backgroundColor="#F0F0F0" horizontalScrollPolicy="off">
+		</mx:Canvas>
+		<mx:Canvas width="600" height="50" top="650">
+			<mx:LinkButton label="放大" id="zoom_in" click="zoom_in_func(event)" />
+			<mx:LinkButton label="缩小" left="100" id="zoom_out" click="zoom_out_func(event)"  />
+			<mx:Label id="status" left="200" />
+		</mx:Canvas>
+	</mx:Canvas>
+</mx:Application>

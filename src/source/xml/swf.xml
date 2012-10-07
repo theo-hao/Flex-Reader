@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <gallery label="All">
+     	<file label="1" src="source/swf/1.swf" />
+        <file label="2" src="source/swf/2.swf" />
+        <file label="3" src="source/swf/3.swf" />
+        <file label="4" src="source/swf/4.swf" />
+        <file label="5" src="source/swf/5.swf" />
+    </gallery>
+     <gallery label="Japan">
+        <file label="1" src="source/swf/1.swf" />
+        <file label="2" src="source/swf/2.swf" />
+    </gallery>
+      <gallery label="Travel">
+     <file label="3" src="source/swf/3.swf" />
+        <file label="4" src="source/swf/4.swf" />
+        <file label="5" src="source/swf/5.swf" />
+    </gallery>
+</root>

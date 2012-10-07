@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- http://blog.flexexamples.com/2007/08/20/using-a-custom-context-menu-with-the-flex-datagrid-control/ -->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+
+        layout="vertical"
+
+        verticalAlign="middle"
+
+        backgroundColor="white"
+
+        creationComplete="init()">
+
+
+
+    <mx:Script>
+
+        <![CDATA[
+
+            import mx.controls.Alert;
+
+
+
+            [Bindable]
+
+            private var cm:ContextMenu;
+
+
+
+            private var alert:Alert;
+
+
+
+            private function init():void {
+
+                var cmi:ContextMenuItem = new ContextMenuItem("View item", true);
+
+                cmi.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, contextMenuItem_menuItemSelect);
+
+
+
+                cm = new ContextMenu();
+
+                cm.hideBuiltInItems();
+
+                cm.customItems = [cmi];
+
+                cm.addEventListener(ContextMenuEvent.MENU_SELECT, contextMenu_menuSelect);
+
+            }
+
+
+
+            private function contextMenu_menuSelect(evt:ContextMenuEvent):void {
+
+                dataGrid.selectedIndex = lastRollOverIndex;
+
+            }
+
+
+
+            private function contextMenuItem_menuItemSelect(evt:ContextMenuEvent):void {
+
+                var obj:Object = dataGrid.selectedItem;
+
+                alert = Alert.show("Property A: " + obj.@propertyA + "\n" + "Property B: " + obj.@propertyB, obj.@label, Alert.OK);
+
+            }
+
+        ]]>
+
+    </mx:Script>
+
+
+
+    <mx:XML id="itemsXML">
+
+        <items>
+
+            <item label="Item 1" data="i001" propertyA="Item 1.A" propertyB="Item 1.B" />
+
+            <item label="Item 2" data="i002" propertyA="Item 2.A" propertyB="Item 2.B" />
+
+            <item label="Item 3" data="i003" propertyA="Item 3.A" propertyB="Item 3.B" />
+
+            <item label="Item 4" data="i004" propertyA="Item 4.A" propertyB="Item 4.B" />
+
+            <item label="Item 5" data="i005" propertyA="Item 5.A" propertyB="Item 5.B" />
+
+            <item label="Item 6" data="i006" propertyA="Item 6.A" propertyB="Item 6.B" />
+
+            <item label="Item 7" data="i007" propertyA="Item 7.A" propertyB="Item 7.B" />
+
+            <item label="Item 8" data="i008" propertyA="Item 8.A" propertyB="Item 8.B" />
+
+        </items>
+
+    </mx:XML>
+
+
+
+    <mx:Number id="lastRollOverIndex" />
+
+
+
+    <mx:DataGrid id="dataGrid"
+
+            width="400"
+
+            dataProvider="{itemsXML.item}"
+
+             contextMenu="{cm}"
+
+             itemRollOver="lastRollOverIndex = event.rowIndex">
+
+        <mx:columns>
+
+            <mx:DataGridColumn id="labelCol"
+
+                    dataField="@label"
+
+                    headerText="Label:" />
+
+
+
+            <mx:DataGridColumn id="propACol"
+
+                    dataField="@propertyA"
+
+                    headerText="Property A:" />
+
+
+
+            <mx:DataGridColumn id="propBCol"
+
+                    dataField="@propertyB"
+
+                    headerText="Property B:" />
+
+        </mx:columns>
+
+    </mx:DataGrid>
+
+
+
+    <mx:Label text="{dataGrid.selectedItem.@label}" />
+
+
+
+</mx:Application>

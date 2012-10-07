@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <gallery label="All">
+     	<file label="Travel_1" src="source/image/travel_1.jpg" />
+        <file label="Travel_2" src="source/image/travel_2.jpg" />
+        <file label="Travel_3" src="source/image/travel_3.jpg" />
+        <file label="Japan_1" src="source/image/japan_1.jpg" />
+        <file label="Japan_2" src="source/image/japan_2.jpg" />
+    </gallery>
+     <gallery label="Japan">
+        <file label="Japan_1" src="source/image/japan_1.jpg" />
+        <file label="Japan_2" src="source/image/japan_2.jpg" />
+    </gallery>
+      <gallery label="Travel">
+        <file label="Travel_1" src="source/image/travel_1.jpg" />
+        <file label="Travel_2" src="source/image/travel_2.jpg" />
+        <file label="Travel_3" src="source/image/travel_3.jpg" />
+    </gallery>
+</root>
